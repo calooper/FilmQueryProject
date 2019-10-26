@@ -8,57 +8,172 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.skilldistillery.filmquery.entities.Actor;
 import com.skilldistillery.filmquery.entities.Film;
 
 public class DatabaseAccessorObject implements DatabaseAccessor {
 
-  @Override
-  public Film findFilmById(int filmId) {
-    return null;
-    
-    //fix this 
-  }
-  //TODO
-//public Actor findActorById(int actorId);
-  
-  
-//public List<Actor> findActorsByFilmId(int filmId){ }
-  
-//  public List<Film> findFilmsByActorId(int actorId) {
-//	  List<Film> films = new ArrayList<>();
-//	  try {
-//	    Connection conn = DriverManager.getConnection(url, user, pass);
-//	    String sql = "SELECT id, title, description, release_year, language_id, rental_duration, ";
-//	                sql += " rental_rate, length, replacement_cost, rating, special_features "
-//	               +  " FROM film JOIN film_actor ON film.id = film_actor.film_id "
-//	               + " WHERE actor_id = ?";
-//	    PreparedStatement stmt = conn.prepareStatement(sql);
-//	    stmt.setInt(1, actorId);
-//	    ResultSet rs = stmt.executeQuery();
-//	    while (rs.next()) {
-//	      int filmId = rs.getInt(1);
-//	      String title = rs.getString(2);
-//	      String desc = rs.getString(3);
-//	      short releaseYear = rs.getShort(4);
-//	      int langId = rs.getInt(5);
-//	      int rentDur = rs.getInt(6);
-//	      double rate = rs.getDouble(7);
-//	      int length = rs.getInt(8);
-//	      double repCost = rs.getDouble(9);
-//	      String rating = rs.getString(10);
-//	      String features = rs.getString(11);
-//	      Film film = new Film(filmId, title, desc, releaseYear, langId,
-//	                           rentDur, rate, length, repCost, rating, features);
-//	      films.add(film);
-//	    }
-//	    rs.close();
-//	    stmt.close();
-//	    conn.close();
-//	  } catch (SQLException e) {
-//	    e.printStackTrace();
-//	  }
-//	  return films;
-//	}
-  
+	private static final String URL = "jdbc:mysql://localhost:3306/sdvid?useSSL=false";
 
+	@Override
+	public Film findFilmById(int filmId) throws SQLException {
+
+		List<Actor> actors = findActorsByFilmId(filmId);
+		Film film = null;
+
+		String user = "student";
+		String pass = "student";
+
+		Connection conn = DriverManager.getConnection(URL, user, pass);
+
+		String sql = "SELECT film.id, title, description, release_year, language_id, rental_duration, "
+				+ "length,replacement_cost, rating FROM film WHERE id = ?";
+
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, filmId);
+		ResultSet filmResult = stmt.executeQuery();
+		if (filmResult.next()) {
+
+			Integer id = filmResult.getInt("id"); // a set.id needs to construct a list of actors
+			String title = filmResult.getString("title"); // a set.id needs to construct a list of actors
+			String description = filmResult.getString("description");
+			Integer realeseYear = filmResult.getInt("release_year");
+			int languageId = filmResult.getInt("language_id");
+			String language = getLanguage(languageId);
+			int rentalDuration = filmResult.getInt("rental_duration");
+			int length = filmResult.getInt("length");
+			Double replacementCost = filmResult.getDouble("replacement_cost");
+			String rating = filmResult.getString("rating");
+
+			film = new Film(id, title, description, realeseYear, language, languageId, rentalDuration, length,
+					replacementCost, rating, actors);
+
+		}
+
+		return film;
+
+	}
+
+	@Override
+	public Actor findActorById(int actorId) throws SQLException {
+
+		String user = "student";
+		String pass = "student";
+		Connection conn = DriverManager.getConnection(URL, user, pass);
+
+		Actor actor = null;
+		// ...
+		String sql = "SELECT id, first_name, last_name FROM actor WHERE id = ?";
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, actorId);
+		ResultSet actorResult = stmt.executeQuery();
+		if (actorResult.next()) {
+			actor = new Actor();
+
+			actor.setId(actorResult.getInt("id"));
+			actor.setFirstName(actorResult.getString("first_name"));
+			actor.setLastName(actorResult.getString("last_name"));
+		}
+
+		return actor;
+	}
+
+	@Override
+	public List<Actor> findActorsByFilmId(int filmId) throws SQLException {
+
+		String user = "student";
+		String pass = "student";
+
+		List<Actor> actorList = new ArrayList<>();
+		try {
+			Connection conn = DriverManager.getConnection(URL, user, pass);
+			String sql = "SELECT * "
+					+ " FROM Actor JOIN film_actor  ON actor.id = film_actor.actor_id "
+					+ " WHERE id is not null and film_id = ? ";
+			PreparedStatement stmt = conn.prepareStatement(sql);
+			stmt.setInt(1, filmId);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				Integer id = rs.getInt("id");
+				String firstName = rs.getString("first_name");
+				String lastName = rs.getString("last_name");
+
+				Actor actor = new Actor(id, firstName, lastName);
+				actorList.add(actor);
+			}
+			rs.close();
+			stmt.close();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return actorList;
+	}
+
+	@Override
+	public List<Film> findFilmByKeyword(String keyword) throws SQLException {
+
+		List<Actor> actors;
+		Film film = null;
+		List<Film> films = new ArrayList<>();
+
+		String user = "student";
+		String pass = "student";
+
+		Connection conn = DriverManager.getConnection(URL, user, pass);
+
+		String sql = "SELECT * FROM film f JOIN film_actor fa " + "ON f.id = fa.actor_id JOIN actor a "
+				+ "ON fa.film_id = a.id " + "WHERE description like ? OR title like ? order by f.id";
+
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.setString(1, "%" + keyword + "%");
+		stmt.setString(2, "%" + keyword + "%");
+		ResultSet filmResult = stmt.executeQuery();
+		while (filmResult.next()) {
+
+			Integer id = filmResult.getInt("id"); // a set.id needs to construct a list of actors
+			actors = findActorsByFilmId(id);
+			String title = filmResult.getString("title"); // a set.id needs to construct a list of actors
+			String description = filmResult.getString("description");
+			Integer realeseYear = filmResult.getInt("release_year");
+			int languageId = filmResult.getInt("language_id");
+			String language = getLanguage(languageId);
+			int rentalDuration = filmResult.getInt("rental_duration");
+			int length = filmResult.getInt("length");
+			Double replacementCost = filmResult.getDouble("replacement_cost");
+			String rating = filmResult.getString("rating");
+
+			film = new Film(id, title, description, realeseYear, language, languageId, rentalDuration, length,
+					replacementCost, rating, actors);
+
+			films.add(film);
+
+		}
+
+		return films;
+
+	}
+
+//
+	public String getLanguage(int languageId) throws SQLException {
+		String language = null;
+
+		String user = "student";
+		String pass = "student";
+
+		Connection conn = DriverManager.getConnection(URL, user, pass);
+
+		String sql = "SELECT  name, id FROM language where id = ?";
+
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.setInt(1, languageId);
+
+		ResultSet filmResult = stmt.executeQuery();
+		if (filmResult.next()) {
+
+			language = filmResult.getString("name");
+
+		}
+		return language;
+	}
 }

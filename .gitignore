@@ -1,3 +1,25 @@
 .DS_Store
 target
 bin
+
+SELECT id, title, description, release_year, language_id, rental_duration,
+				length,replacement_cost, rating FROM actor WHERE id = ?;
+
+
+        SELECT id, title, description, release_year, language_id, rental_duration, length,replacement_cost, rating FROM film join film_actor on film.id = film_actor.film_id WHERE description like  "%it%";
+
+
+        SELECT id, title, description, release_year, language_id, rental_duration, length, replacement_cost, rating
+        FROM actor a JOIN film_actor fa ON a.id = fa.actor_id
+              JOIN film f ON fa.film_id = f.id
+                WHERE description like  "%bob%" OR  title like  "%it%";
+
+
+SELECT a.first_name, a.last_name, f.title FROM actor a JOIN film_actor fa ON a.id = fa.actor_id JOIN film f ON fa.film_id a.first_name, a.last_name = f.id WHERE description like  "%bob%" OR title like "%it%";
+
+
+
+SELECT f.id, f.title, f.description, f.release_year, f.language_id, f.rental_duration, f.length, f.replacement_cost, f.rating, a.first_name, a.last_name FROM film f JOIN film_actor fa ON f.id = fa.film_id JOIN actor a ON  a.id = fa.actor_id WHERE description like "%cow%" OR title like "%cow%"
+
+SELECT id, title, description, release_year, language_id, rental_duration,
+				length,replacement_cost, rating
