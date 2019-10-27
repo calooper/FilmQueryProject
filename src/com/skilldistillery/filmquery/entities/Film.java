@@ -15,6 +15,7 @@ public class Film {
 	private double replacementCost;
 	private String rating;
 	private List<Actor> actorList;
+	
 
 	public Film(Integer id, String title, String description, Integer releaseYear, String language, int languageId,
 			int rentalDuration, int length, double replacementCost, String rating, List<Actor> actorList) {
@@ -186,15 +187,18 @@ public class Film {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		
 		System.out.println("-----------------");
-		System.out.println("\tActors: ");
+		
+		
+		
+		builder.append(id);
+		System.out.println("\tActors in " + title);
 		for (Actor actor : actorList) {
 			System.out.println("\t" + actor);
 		}
-		builder.append("\tFilm ID = ");
-		builder.append(id);
-		builder.append(", \tLanguage=");
+		//builder.append("\tFilm ID = ");
+		
+		builder.append(" \tLanguage=");
 		builder.append(language);
 		builder.append(" \tTitle = ");
 		builder.append(title);

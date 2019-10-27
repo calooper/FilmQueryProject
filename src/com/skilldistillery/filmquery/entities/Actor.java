@@ -1,7 +1,5 @@
 package com.skilldistillery.filmquery.entities;
 
-import java.util.List;
-
 public class Actor {
 
 	private Integer id;
@@ -77,13 +75,12 @@ public class Actor {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Actor [id=");
+		
+		builder.append("Full name: ");
+		builder.append(firstName + " ");
+		builder.append(lastName + " \t");
+		builder.append( "Actor id =");
 		builder.append(id);
-		builder.append(", firstName=");
-		builder.append(firstName);
-		builder.append(", lastName=");
-		builder.append(lastName);
-		builder.append("]");
 		return builder.toString();
 	}
 	

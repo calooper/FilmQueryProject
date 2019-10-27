@@ -23,3 +23,17 @@ SELECT f.id, f.title, f.description, f.release_year, f.language_id, f.rental_dur
 
 SELECT id, title, description, release_year, language_id, rental_duration,
 				length,replacement_cost, rating
+
+        SELECT f.title  FROM actor a JOIN film_actor fa ON a.id = fa.actor_id JOIN film f ON fa.film_id = f.id WHERE description like '%balloon%' OR title like '%balloon%' order by f.id
+
+
+
+
+        SELECT DISTINCT(F.id, f.title, f.description, f.release_year, f.language_id, f.rental_duration, f.length, replacement_cost, rating) FROM film f JOIN film_actor fa ON f.id = fa.actor_id JOIN actor a ON fa.film_id = a.id WHERE description like '%balloon%' OR title like '%balloon%' order by F.id
+
+
+
+
+
+
+        SELECT * FROM film WHERE description like '%balloon%'  OR title like '%balloon%'  order by F.TITLE

@@ -23,7 +23,6 @@ public class FilmQueryApp {
 		try {
 			startUserInterface(input);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -39,60 +38,24 @@ public class FilmQueryApp {
 		System.out.println("1. Look up a film by its id ");
 		System.out.println("2. Look up a film by a search keyword");
 		System.out.println("3. Exit the application. ");
-		System.out.println("+-----------------------------------+");
 		int menuChoice = scanner.nextInt();
 
 		while (keepGoing) {
 			switch (menuChoice) {
 			case 1:
-				Film film = null;
-				System.out.println("Enter a film ID please");
-				int filmID = scanner.nextInt();
-				film = filmByID(filmID);
-				if (film == null) {
-					System.out.println("Sorry that is not a film ID");
-					startUserInterface(scanner);
-					break;
-				} else
-					System.out.println(film);
-				startUserInterface(scanner);
+
+				filmByID(scanner);
 				break;
 
 			case 2:
-				int id = 0;
-				int count = 0;
-				List<Film> films;
-				System.out.println("Please enter a keyword to search for a movie");
-				String keyword = scanner.next();
-				films = searchFilm(keyword);
-				if (films.isEmpty()) {
-					System.out.println("There are no films matching that keyword");
-					startUserInterface(scanner);
-				} else
 
-					for (Film filmPrint : films) {
-
-						if (filmPrint.getId() == id) {
-
-							continue;
-							
-						} else {
-							System.out.println(filmPrint);
-							count++;
-							id = filmPrint.getId();
-
-						}
-
-					}
-				if (count != 0)
-					System.out.println("-----------------------------------");
-					System.out.println("There's " + count + " film(s) matching that keyword");
-				startUserInterface(scanner);
-				break;
-
+				searchFilm(scanner);
+				break; 
+				
 			case 3:
 				System.out.println("Exiting...");
 				keepGoing = false;
+				System.exit(1);
 				break;
 
 			default:
@@ -101,29 +64,39 @@ public class FilmQueryApp {
 		}
 	}
 
-	private Film filmByID(int filmID) {
+	private void filmByID(Scanner scanner) throws SQLException {
 
 		DatabaseAccessorObject dbo = new DatabaseAccessorObject();
 		Film film = null;
 
+		System.out.println("Enter a film ID please");
+		int filmID = scanner.nextInt();
+
 		try {
 			film = dbo.findFilmById(filmID);
 			if (film == null) {
+				System.out.println("Sorry that is not an Id in the database");
 
-			}
-			return film;
+			} else
+				System.out.println(film);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return film;
+
+		startUserInterface(scanner);
 
 	}
 
-	private List<Film> searchFilm(String keyword) {
+	private void searchFilm(Scanner scanner) throws SQLException {
+		
 
-		List<Film> films = null;
 		DatabaseAccessorObject dbo = new DatabaseAccessorObject();
+
+		int id = 0;
+		List<Film> films = null;
+		System.out.println("Please enter a keyword to search for a movie");
+		String keyword = scanner.next();
 
 		try {
 			films = dbo.findFilmByKeyword(keyword);
@@ -131,6 +104,36 @@ public class FilmQueryApp {
 			e.printStackTrace();
 		}
 
-		return films;
+		if (films.isEmpty()) {
+			System.out.println("There are no films matching that keyword");
+		} else
+
+			for (Film filmPrint : films) {
+
+				if (filmPrint.getId() == id) {
+
+					continue;
+
+				} else {
+					System.out.println(filmPrint);
+					id = filmPrint.getId();
+
+				}
+
+			}
+		if (films.size() != 0) {
+			System.out.println("----------------------------------------------");
+		System.out.println("There's " + films.size() + " film(s) matching keyword: " + keyword);
+		startUserInterface(scanner);
+		
+		}
+		else
+			
+		startUserInterface(scanner);
+		
+		
+		
+
+
 	}
 }
