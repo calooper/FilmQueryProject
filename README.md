@@ -1,4 +1,4 @@
-###OVERVIEW
+### OVERVIEW
 
 This project is a command-line application that uses ORM with Java Database
 Connectivity to retrieve information from a database
@@ -16,7 +16,7 @@ that have that keyword in the description or title. If there are no films matchi
 the keyword, the user will be informed and then prompted to select another option.
 
 
-###Technologies
+### Technologies
 The JDBC code is encapsulated in methods in a class called DataAccessorObject.
 Each of these methods connects to the database and executes a prepared statement
 from a string SQL query. The information from the database is used to create
@@ -24,7 +24,7 @@ Film objects and Actor objects. Film objects contain a list of actor objects.
 
 
 
-##Lessons learned
+### Lessons learned
 This project was a great experience getting to work with a database. I did have
 some trouble with my SQL query returning too many results from my joiner table,
 but I eventually figured out that the problem was in my ON clause.
